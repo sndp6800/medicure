@@ -1,11 +1,12 @@
+// Server-side connection utility. Never import this module into client components.
 const mongoose = require('mongoose');
-
-// Replace with your MongoDB connection string
-const connectionString = 'mongodb+srv://root:<password>@medicure.znsbupj.mongodb.net/?retryWrites=true&w=majority&appName=MediCure';
-
-mongoose.connect(connectionString, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('MongoDB connected successfully'))
-.catch(err => console.error(err));
+const connectionString = process.env.MONGODB_URI;
+if (!connectionString) {
+  throw new Error('Set MONGODB_URI in the server environment.');
+}
+mongoose.connect(connectionString)
+  .then(() => console.log('MongoDB connected successfully'))
+  .catch(() => {
+    console.error('MongoDB connection failed. Check server configuration.');
+    process.exitCode = 1;
+  });
